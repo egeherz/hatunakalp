@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Seni Seviyorum Birtanem</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      background: url('https://i.imgur.com/saBY0cK.jpeg') no-repeat center center fixed;
+      background-size: cover;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      color: white;
+      font-family: 'Segoe UI', sans-serif;
+      overflow: hidden;
+    }
+
+    .overlay {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      backdrop-filter: brightness(0.7) blur(3px);
+      z-index: 0;
+    }
+
+    .container {
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+    }
+
+    svg {
+      width: 220px;
+      height: 220px;
+      stroke: #ff0066;
+      fill: none;
+      stroke-width: 3;
+      stroke-dasharray: 1000;
+      stroke-dashoffset: 1000;
+      filter: drop-shadow(0 0 10px #ff0066);
+      animation: draw 3s ease-in-out forwards, pulseGlow 2s infinite ease-in-out 3s, fillHeart 1s ease-in-out forwards 3s;
+    }
+
+    @keyframes draw {
+      to {
+        stroke-dashoffset: 0;
+      }
+    }
+
+    @keyframes fillHeart {
+      to {
+        fill: #ff0066;
+      }
+    }
+
+    @keyframes pulseGlow {
+      0%, 100% {
+        filter: drop-shadow(0 0 8px #ff0066);
+      }
+      50% {
+        filter: drop-shadow(0 0 20px #ff3399);
+      }
+    }
+
+    .message {
+      margin-top: 30px;
+      font-size: 2.3rem;
+      text-align: center;
+      animation: fadeIn 2s ease-in-out 4.5s forwards;
+      opacity: 0;
+      color: #fff;
+      text-shadow: 0 0 10px #ff0080, 0 0 20px #ff3399;
+    }
+
+    @keyframes fadeIn {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .heart-particle {
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      background: red;
+      transform: rotate(45deg);
+      animation: float 2s ease-in-out forwards;
+      opacity: 0.8;
+    }
+
+    .heart-particle::before,
+    .heart-particle::after {
+      content: "";
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      background: red;
+      border-radius: 50%;
+    }
+
+    .heart-particle::before {
+      top: -10px;
+      left: 0;
+    }
+
+    .heart-particle::after {
+      left: -10px;
+      top: 0;
+    }
+
+    @keyframes float {
+      0% {
+        transform: translate(0, 0) scale(1);
+        opacity: 0.9;
+      }
+      100% {
+        transform: translate(var(--x), var(--y)) scale(0.6);
+        opacity: 0;
+      }
+    }
+
+    .music-control {
+      margin-top: 20px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid #fff;
+      padding: 8px 16px;
+      border-radius: 20px;
+      color: #fff;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: background 0.3s;
+    }
+
+    .music-control:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    audio {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="overlay"></div>
+
+  <div class="container">
+    <svg viewBox="0 0 32 29.6" id="mainHeart">
+      <path d="M23.6,0c-2.9,0-5.4,1.8-6.6,4.4C15.8,1.8,13.3,0,10.4,0C4.7,0,0,4.7,0,10.4c0,7.3,9.7,13.2,16,19.2
+      c6.3-6,16-11.9,16-19.2C32,4.7,27.3,0,21.6,0H23.6z"/>
+    </svg>
+
+    <div class="message">Seni seviyorum birtanem ❤️</div>
+    <button class="music-control" onclick="toggleMusic()">🎵 Müzik Çal / Durdur</button>
+    <audio id="bgMusic" loop>
+      <source src="https://cdn.pixabay.com/download/audio/2023/03/30/audio_126555998a.mp3?filename=romantic-piano-14351.mp3" type="audio/mp3">
+    </audio>
+  </div>
+
+  <script>
+    const music = document.getElementById('bgMusic');
+    function toggleMusic() {
+      if (music.paused) music.play();
+      else music.pause();
+    }
+
+    const container = document.querySelector('.container');
+
+    function createHeart() {
+      const heart = document.createElement('div');
+      heart.classList.add('heart-particle');
+      const x = (Math.random() - 0.5) * 200 + 'px';
+      const y = -150 + Math.random() * -100 + 'px';
+      heart.style.setProperty('--x', x);
+      heart.style.setProperty('--y', y);
+      container.appendChild(heart);
+      setTimeout(() => heart.remove(), 2000);
+    }
+
+    setInterval(() => {
+      for (let i = 0; i < 2; i++) createHeart();
+    }, 300);
+  </script>
+</body>
+</html>
