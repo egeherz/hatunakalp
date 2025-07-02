@@ -1,1 +1,1 @@
-# hatunakalp
+YARIN DAHADA NET GÖRECEKSİN BURAYI - BETA 0.1
