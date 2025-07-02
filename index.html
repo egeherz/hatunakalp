@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Seni Seviyorum Birtanem - Ultra Modern</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Pacifico&display=swap');
+
+  * {
+    margin: 0; padding: 0; box-sizing: border-box;
+  }
+  body, html {
+    height: 100%;
+    background: url('https://i.imgur.com/saBY0cK.jpeg') no-repeat center center fixed;
+    background-size: cover;
+    overflow: hidden;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    color: white;
+    position: relative;
+  }
+
+  /* Daha net arka plan, bulanıklık azaltıldı */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background: url('https://i.imgur.com/saBY0cK.jpeg') no-repeat center center fixed;
+    background-size: cover;
+    filter: brightness(0.85);
+    z-index: -2;
+  }
+
+  /* Hafif transparan siyah katman, bulanıklık ve koyuluk az */
+  .overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.25);
+    backdrop-filter: blur(0.5px);
+    z-index: -1;
+  }
+
+  .container {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    user-select: none;
+  }
+
+  svg.main-heart {
+    width: 280px;
+    height: 280px;
+    fill: none;
+    stroke-width: 5;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+    stroke: #FF33CC;
+    filter:
+      drop-shadow(0 0 7px #FF33CC)
+      drop-shadow(0 0 15px #FF66FF)
+      drop-shadow(0 0 30px #FF99FF);
+    stroke-dasharray: 1000;
+    stroke-dashoffset: 1000;
+    animation: drawNeon 6.5s cubic-bezier(0.5, 0, 0.2, 1) forwards;
+  }
+
+  @keyframes drawNeon {
+    0% {
+      stroke-dashoffset: 1000;
+      opacity: 0.3;
+      filter: drop-shadow(0 0 7px #FF33CC);
+    }
+    50% {
+      opacity: 0.7;
+      filter: drop-shadow(0 0 18px #FF33CC);
+      stroke-dashoffset: 500;
+    }
+    100% {
+      stroke-dashoffset: 0;
+      opacity: 1;
+      filter: drop-shadow(0 0 35px #FF66FF);
+    }
+  }
+
+  .message {
+    margin-top: 40px;
+    font-size: 3rem;
+    color: #ff33cc;
+    text-shadow:
+      0 0 5px #ff33cc,
+      0 0 10px #ff66ff,
+      0 0 15px #ff99ff;
+    white-space: nowrap;
+    overflow: hidden;
+    border-right: 3px solid rgba(255, 51, 204, 0.8);
+    opacity: 0;
+    animation: typewriter 6s steps(30) 6.8s forwards, blinkCaret 0.9s step-end infinite 12.8s;
+    font-family: 'Pacifico', cursive;
+  }
+  @keyframes typewriter {
+    from { width: 0; opacity: 1; }
+    to { width: 100%; opacity: 1; }
+  }
+  @keyframes blinkCaret {
+    50% { border-color: transparent; }
+    100% { border-color: rgba(255, 51, 204, 0.8); }
+  }
+
+  .underline {
+    width: 60%;
+    height: 4px;
+    background: linear-gradient(90deg, #ff33cc, #ff66ff, #ff33cc);
+    margin: 12px auto 0;
+    border-radius: 2px;
+    opacity: 0;
+    animation: underlineGrow 2s ease forwards 13.2s;
+  }
+  @keyframes underlineGrow {
+    from { width: 0; opacity: 1; }
+    to { width: 60%; opacity: 1; }
+  }
+
+  /* İmza sağ altta ultra modern neon */
+  .signature {
+    position: fixed;
+    bottom: 20px;
+    right: 30px;
+    font-family: 'Pacifico', cursive;
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: #ff33cc;
+    text-shadow:
+      0 0 6px #ff33cc,
+      0 0 12px #ff66ff,
+      0 0 20px #ff99ff;
+    opacity: 0;
+    animation: fadeInSign 3s ease forwards 14s;
+    user-select: none;
+    letter-spacing: 1.3px;
+  }
+  @keyframes fadeInSign {
+    from {
+      opacity: 0;
+      transform: translateX(15px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  /* Mini kalpler */
+  .floating-heart {
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    filter:
+      drop-shadow(0 0 5px #ff33cc)
+      drop-shadow(0 0 12px #ff66ff);
+    pointer-events: none;
+    animation-timing-function: linear;
+    will-change: transform, opacity;
+    user-select: none;
+  }
+
+  @keyframes floatUp {
+    0% {
+      transform: translateY(0) rotate(0deg) scale(1);
+      opacity: 1;
+    }
+    100% {
+      transform: translateY(-260px) rotate(360deg) scale(1.5);
+      opacity: 0;
+    }
+  }
+</style>
+</head>
+<body>
+  <div class="overlay"></div>
+
+  <div class="container" role="main" aria-label="Neon kalp animasyonu">
+    <svg class="main-heart" viewBox="0 0 32 29.6" aria-hidden="true" focusable="false">
+      <path d="M23.6,0c-2.9,0-5.4,1.8-6.6,4.4C15.8,1.8,13.3,0,10.4,0C4.7,0,0,4.7,0,10.4c0,7.3,9.7,13.2,16,19.2
+        c6.3-6,16-11.9,16-19.2C32,4.7,27.3,0,21.6,0H23.6z"/>
+    </svg>
+
+    <div class="message" aria-live="polite">Seni seviyorum birtanem ❤️</div>
+    <div class="underline"></div>
+  </div>
+
+  <div class="signature" aria-label="Oluşturan: Ege Deniz">Oluşturan: Ege Deniz</div>
+
+  <script>
+    const colors = ['#ff33cc', '#ff66ff', '#ff00cc', '#ff0099', '#ff66cc'];
+
+    function createFloatingHeart() {
+      const heartSVG = `
+        <svg viewBox="0 0 32 29.6" xmlns="http://www.w3.org/2000/svg" fill="${colors[Math.floor(Math.random()*colors.length)]}" width="18" height="18" aria-hidden="true">
+          <path d="M23.6,0c-2.9,0-5.4,1.8-6.6,4.4C15.8,1.8,13.3,0,10.4,0C4.7,0,0,4.7,0,10.4c0,7.3,9.7,13.2,16,19.2
+          c6.3-6,16-11.9,16-19.2C32,4.7,27.3,0,21.6,0H23.6z"/>
+        </svg>
+      `;
+
+      const div = document.createElement('div');
+      div.classList.add('floating-heart');
+      div.style.left = Math.random() * 100 + 'vw';
+      div.style.animationDuration = (4 + Math.random() * 3) + 's';
+      div.style.opacity = (0.5 + Math.random() * 0.5);
+      div.innerHTML = heartSVG;
+      document.body.appendChild(div);
+
+      div.style.animationName = 'floatUp';
+
+      setTimeout(() => div.remove(), 8000);
+    }
+
+    setTimeout(() => {
+      setInterval(createFloatingHeart, 350);
+    }, 6500);
+  </script>
+</body>
+</html>
