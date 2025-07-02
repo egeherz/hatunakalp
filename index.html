@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Elle Çizilmiş Neon Kalp</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Pacifico&display=swap');
+
+  * {
+    margin: 0; padding: 0; box-sizing: border-box;
+  }
+  body, html {
+    height: 100%;
+    background: url('https://i.imgur.com/saBY0cK.jpeg') no-repeat center center fixed;
+    background-size: cover;
+    overflow: hidden;
+    font-family: 'Pacifico', cursive, 'Segoe UI', sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    color: #fff;
+    position: relative;
+  }
+
+  .overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    backdrop-filter: blur(5px);
+    z-index: 0;
+    animation: pulseOverlay 8s ease-in-out infinite alternate;
+  }
+  @keyframes pulseOverlay {
+    0% { backdrop-filter: blur(4px) brightness(0.55); }
+    100% { backdrop-filter: blur(6px) brightness(0.65); }
+  }
+
+  .container {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    user-select: none;
+  }
+
+  svg.main-heart {
+    width: 280px;
+    height: 280px;
+    fill: none;
+    stroke-width: 5;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+    stroke: #FF00FF;
+    filter:
+      drop-shadow(0 0 6px #FF00FF)
+      drop-shadow(0 0 15px #FF00FF)
+      drop-shadow(0 0 25px #FF33FF);
+    stroke-dasharray: 1000;
+    stroke-dashoffset: 1000;
+    animation: drawNeon 7s cubic-bezier(0.5, 0, 0.2, 1) forwards;
+  }
+
+  /* Elle çizim hissi için path dalgalanması */
+  @keyframes handDrawShake {
+    0%, 100% { filter: drop-shadow(0 0 10px #FF00FF); }
+    50% { filter: drop-shadow(0 0 20px #FF66FF); }
+  }
+
+  /* Stroke animasyonu: çizgi yavaş yavaş ortaya çıkıyor */
+  @keyframes drawNeon {
+    0% {
+      stroke-dashoffset: 1000;
+      filter: drop-shadow(0 0 10px #FF00FF);
+      opacity: 0.25;
+    }
+    20% {
+      opacity: 0.5;
+      filter: drop-shadow(0 0 25px #FF33FF);
+      stroke-dashoffset: 700;
+    }
+    100% {
+      stroke-dashoffset: 0;
+      opacity: 1;
+      filter: drop-shadow(0 0 30px #FF00FF);
+    }
+  }
+
+  /* Hafif titreşimle elle çizim efekti */
+  svg.main-heart:hover {
+    animation: handDrawShake 3s ease-in-out infinite;
+  }
+
+  .message {
+    margin-top: 45px;
+    font-size: 3rem;
+    color: #FF33FF;
+    text-shadow:
+      0 0 5px #FF00FF,
+      0 0 10px #FF00FF,
+      0 0 20px #FF66FF,
+      0 0 30px #FF33FF;
+    white-space: nowrap;
+    overflow: hidden;
+    border-right: 3px solid rgba(255, 0, 255, 0.8);
+    opacity: 0;
+    animation: typewriter 6s steps(30) 7.2s forwards, blinkCaret 0.9s step-end infinite 13.2s;
+    font-family: 'Pacifico', cursive;
+  }
+  @keyframes typewriter {
+    from { width: 0; opacity: 1; }
+    to { width: 100%; opacity: 1; }
+  }
+  @keyframes blinkCaret {
+    50% { border-color: transparent; }
+    100% { border-color: rgba(255, 0, 255, 0.8); }
+  }
+
+  .underline {
+    width: 60%;
+    height: 4px;
+    background: linear-gradient(90deg, #ff00ff, #ff66ff, #ff00ff);
+    margin: 12px auto 0;
+    border-radius: 2px;
+    opacity: 0;
+    animation: underlineGrow 2s ease forwards 13.5s;
+  }
+  @keyframes underlineGrow {
+    from { width: 0; opacity: 1; }
+    to { width: 60%; opacity: 1; }
+  }
+
+  .signature {
+    margin-top: 30px;
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: rgba(255, 0, 255, 0.75);
+    text-shadow:
+      0 0 8px #FF33FF,
+      0 0 15px #FF00FF;
+    opacity: 0;
+    animation: fadeInShake 3s ease forwards 15.8s;
+    font-family: 'Pacifico', cursive;
+  }
+  @keyframes fadeInShake {
+    0% {
+      opacity: 0;
+      transform: translateX(-12px);
+    }
+    50% {
+      opacity: 1;
+      transform: translateX(12px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  /* Mini neon kalpler */
+  .floating-heart {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    filter:
+      drop-shadow(0 0 6px #FF00FF)
+      drop-shadow(0 0 15px #FF33FF);
+    pointer-events: none;
+    animation-timing-function: linear;
+    will-change: transform, opacity;
+    user-select: none;
+  }
+
+  @keyframes floatUpNeon {
+    0% {
+      transform: translateY(0) rotate(0deg) scale(1);
+      opacity: 1;
+    }
+    100% {
+      transform: translateY(-280px) rotate(360deg) scale(1.7);
+      opacity: 0;
+    }
+  }
+
+  /* Arka plan yumuşak zoom in-out */
+  @keyframes bgZoom {
+    0%, 100% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.03);
+    }
+  }
+
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background: url('https://i.imgur.com/saBY0cK.jpeg') no-repeat center center fixed;
+    background-size: cover;
+    filter: brightness(0.55) blur(4px);
+    animation: bgZoom 35s ease-in-out infinite;
+    z-index: -1;
+  }
+</style>
+</head>
+<body>
+  <div class="overlay"></div>
+
+  <div class="container" role="main" aria-label="Elle çizilmiş neon kalp animasyonu">
+    <svg class="main-heart" viewBox="0 0 32 29.6" aria-hidden="true" focusable="false">
+      <path d="M23.6,0c-2.9,0-5.4,1.8-6.6,4.4C15.8,1.8,13.3,0,10.4,0C4.7,0,0,4.7,0,10.4c0,7.3,9.7,13.2,16,19.2
+        c6.3-6,16-11.9,16-19.2C32,4.7,27.3,0,21.6,0H23.6z"/>
+    </svg>
+
+    <div class="message" aria-live="polite">Seni seviyorum birtanem ❤️</div>
+    <div class="underline"></div>
+    <div class="signature">Oluşturan: Ege Deniz</div>
+  </div>
+
+  <script>
+    const neonColors = ['#FF00FF', '#FF33FF', '#FF66FF', '#FF0099', '#CC00CC'];
+
+    function createNeonFloatingHeart() {
+      const heartSVG = `
+        <svg viewBox="0 0 32 29.6" xmlns="http://www.w3.org/2000/svg" fill="${neonColors[Math.floor(Math.random()*neonColors.length)]}" width="20" height="20" aria-hidden="true">
+          <path d="M23.6,0c-2.9,0-5.4,1.8-6.6,4.4C15.8,1.8,13.3,0,10.4,0C4.7,0,0,4.7,0,10.4c0,7.3,9.7,13.2,16,19.2
+          c6.3-6,16-11.9,16-19.2C32,4.7,27.3,0,21.6,0H23.6z"/>
+        </svg>
+      `;
+
+      const div = document.createElement('div');
+      div.classList.add('floating-heart');
+      div.style.left = Math.random() * 100 + 'vw';
+      div.style.animationDuration = (4 + Math.random() * 3) + 's'; // 4-7 saniye arası
+      div.style.opacity = (0.5 + Math.random() * 0.5);
+      div.innerHTML = heartSVG;
+      document.body.appendChild(div);
+
+      div.style.animationName = 'floatUpNeon';
+
+      setTimeout(() => div.remove(), 8000);
+    }
+
+    // Kalp animasyonu bittikten sonra kalpler çıkmaya başlasın
+    setTimeout(() => {
+      setInterval(createNeonFloatingHeart, 300);
+    }, 7000);
+  </script>
+</body>
+</html>
