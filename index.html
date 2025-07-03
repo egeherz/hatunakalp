@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Aşk V10001 - Performanslı Neon Kalpler</title>
+<style>
+  html, body {
+    margin:0; padding:0; overflow:hidden;
+    width: 100vw; height: 100vh;
+    background: #000;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: white;
+  }
+
+  /* Giriş ekranı */
+  #login {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    background: linear-gradient(135deg, #ff0088, #440044);
+    border-radius: 16px;
+    padding: 40px 60px;
+    box-shadow: 0 0 40px #ff3399cc;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+    max-width: 320px;
+    width: 90vw;
+    z-index: 20;
+  }
+
+  #login h2 {
+    font-size: 3rem;
+    margin: 0;
+    letter-spacing: 0.15em;
+    color: #ff77aa;
+    text-shadow: 0 0 15px #ff77aa;
+  }
+
+  #login input {
+    width: 100%;
+    padding: 14px 18px;
+    font-size: 1.6rem;
+    border-radius: 12px;
+    border: none;
+    background: #220022;
+    color: #ff77aa;
+    text-align: center;
+    outline: none;
+    box-shadow: 0 0 10px #ff77aa77;
+    transition: box-shadow 0.3s ease;
+  }
+  #login input::placeholder {
+    color: #ff77aaaa;
+  }
+  #login input:focus {
+    box-shadow: 0 0 20px #ff1177cc;
+  }
+
+  #login button {
+    width: 100%;
+    padding: 16px 0;
+    font-size: 2rem;
+    border: none;
+    border-radius: 20px;
+    background: #ff1177;
+    color: white;
+    cursor: pointer;
+    box-shadow: 0 0 30px #ff1177cc;
+    transition: background 0.3s ease;
+  }
+  #login button:hover {
+    background: #ff4499;
+    box-shadow: 0 0 40px #ff4499cc;
+  }
+
+  #footer {
+    position: fixed;
+    bottom: 12px;
+    right: 12px;
+    font-size: 16px;
+    color: #ff77aa;
+    text-shadow: 0 0 6px #ff77aa;
+    user-select: none;
+    z-index: 15;
+    display: none;
+  }
+
+  #audioControl, #themeToggle {
+    position: fixed;
+    top: 15px;
+    font-size: 1.6rem;
+    padding: 10px 14px;
+    border-radius: 50%;
+    cursor: pointer;
+    user-select: none;
+    background: #220022bb;
+    color: #ff77aa;
+    box-shadow: 0 0 10px #ff77aaaa;
+    transition: background 0.3s ease;
+    z-index: 15;
+  }
+  #audioControl:hover, #themeToggle:hover {
+    background: #ff1177cc;
+  }
+  #audioControl {
+    left: 15px;
+  }
+  #themeToggle {
+    right: 15px;
+  }
+  #audioControl.hidden, #themeToggle.hidden {
+    display: none;
+  }
+
+  canvas {
+    position: fixed !important;
+    top: 0; left: 0;
+    width: 100vw !important;
+    height: 100vh !important;
+    display: block;
+    z-index: 0;
+  }
+</style>
+</head>
+<body>
+
+<div id="login">
+  <h2>PRENSES</h2>
+  <input type="text" id="username" placeholder="x" maxlength="1" autocomplete="off" autofocus />
+  <input type="password" id="password" placeholder="Şifre" autocomplete="off" />
+  <button id="loginBtn">Giriş Yap</button>
+</div>
+
+<div id="footer">Oluşturan: Ege Deniz</div>
+
+<div id="audioControl" class="hidden" title="Ses Aç / Kapa">🔈</div>
+<div id="themeToggle" class="hidden" title="Tema Değiştir">🌙</div>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.153.0/build/three.min.js"></script>
+<script>
+(() => {
+  const loginDiv = document.getElementById('login');
+  const footer = document.getElementById('footer');
+  const loginBtn = document.getElementById('loginBtn');
+  const audioControl = document.getElementById('audioControl');
+  const themeToggle = document.getElementById('themeToggle');
+
+  let scene, camera, renderer;
+  let hearts = [];
+  let clock;
+  let audio = null;
+  let isAudioPlaying = false;
+  let darkMode = true;
+
+  // Optimize: Kalp geometrisini basitleştirelim, extrude yerine düz ShapeGeometry kullanalım.
+  function createHeartGeometry() {
+    const shape = new THREE.Shape();
+    shape.moveTo(0, 0.5);
+    shape.bezierCurveTo(0, 0.5, -0.5, 0.2, -0.5, 0);
+    shape.bezierCurveTo(-0.5, -0.35, 0, -0.7, 0, -1);
+    shape.bezierCurveTo(0, -0.7, 0.5, -0.35, 0.5, 0);
+    shape.bezierCurveTo(0.5, 0.2, 0, 0.5, 0, 0.5);
+
+    return new THREE.ShapeGeometry(shape);
+  }
+
+  function createHeartMaterial() {
+    return new THREE.MeshBasicMaterial({
+      color: 0xff3399,
+      wireframe: true,
+      opacity: 0.8,
+      transparent: true,
+      blending: THREE.AdditiveBlending,
+    });
+  }
+
+  function initThree() {
+    scene = new THREE.Scene();
+
+    camera = new THREE.PerspectiveCamera(60, window.innerWidth/window.innerHeight, 0.1, 1000);
+    camera.position.z = 6;
+
+    renderer = new THREE.WebGLRenderer({antialias:true, alpha:true});
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+
+    // Arka plan resmi
+    new THREE.TextureLoader().load('https://i.imgur.com/saBY0cK.jpeg', texture => {
+      scene.background = texture;
+    });
+
+    // Işık
+    scene.add(new THREE.AmbientLight(0xff66aa, 0.3));
+    const pointLight = new THREE.PointLight(0xff66aa, 1, 50);
+    pointLight.position.set(0, 10, 10);
+    scene.add(pointLight);
+
+    clock = new THREE.Clock();
+  }
+
+  function createHeart() {
+    const geometry = createHeartGeometry();
+    const material = createHeartMaterial();
+
+    const heartMesh = new THREE.Mesh(geometry, material);
+
+    heartMesh.position.x = (Math.random() - 0.5) * 10;
+    heartMesh.position.y = 6 + Math.random() * 4;
+    heartMesh.position.z = (Math.random() - 0.5) * 6;
+
+    const scale = 0.3 + Math.random() * 0.6;
+    heartMesh.scale.set(scale, scale, scale);
+
+    heartMesh.userData = {
+      rotationSpeedX: (Math.random() - 0.5) * 0.01,
+      rotationSpeedY: (Math.random() - 0.5) * 0.01,
+      fallSpeed: 0.005 + Math.random() * 0.01,
+    };
+
+    scene.add(heartMesh);
+    hearts.push(heartMesh);
+  }
+
+  function animate() {
+    requestAnimationFrame(animate);
+    const delta = clock.getDelta();
+
+    for(let i = hearts.length - 1; i >= 0; i--) {
+      const heart = hearts[i];
+      heart.position.y -= heart.userData.fallSpeed;
+      heart.rotation.x += heart.userData.rotationSpeedX;
+      heart.rotation.y += heart.userData.rotationSpeedY;
+
+      if(heart.position.y < -7) {
+        heart.position.y = 6 + Math.random() * 3;
+        heart.position.x = (Math.random() - 0.5) * 10;
+        heart.position.z = (Math.random() - 0.5) * 6;
+      }
+    }
+
+    renderer.render(scene, camera);
+  }
+
+  function startHeartRain() {
+    // Kalp sayısını performans için 30'a düşürdüm
+    for(let i=0; i<30; i++) createHeart();
+    animate();
+  }
+
+  function onWindowResize() {
+    if(camera && renderer) {
+      camera.aspect = window.innerWidth/window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    }
+  }
+  window.addEventListener('resize', onWindowResize);
+
+  // Geri sayım + başlangıç
+  function showCountdownAndStart() {
+    const countdownText = document.createElement('div');
+    Object.assign(countdownText.style, {
+      position: 'fixed',
+      top: '50%',
+      left: '50%',
+      transform: 'translate(-50%, -50%)',
+      fontSize: '4rem',
+      color: '#ff3399',
+      textShadow: '0 0 8px #ff3399',
+      zIndex: 30,
+      userSelect: 'none',
+      fontWeight: 'bold',
+      textAlign: 'center',
+      padding: '10px 20px',
+      backgroundColor: 'rgba(0,0,0,0.3)',
+      borderRadius: '12px',
+    });
+    let count = 3;
+    countdownText.textContent = `HAZIR OL BOĞULMAYA KALPLERE: ${count}`;
+    document.body.appendChild(countdownText);
+
+    const interval = setInterval(() => {
+      count--;
+      if(count > 0) {
+        countdownText.textContent = `HAZIR OL BOĞULMAYA KALPLERE: ${count}`;
+      } else {
+        countdownText.remove();
+        startHeartRain();
+        audioControl.classList.remove('hidden');
+        themeToggle.classList.remove('hidden');
+      }
+    }, 1000);
+  }
+
+  // Ses kontrolü
+  function setupAudio() {
+    audio = new Audio('Lady Gaga, Bruno Mars - Die With A Smile (Official Music Video).mp3');
+    audio.loop = true;
+    audio.volume = 0.3;
+    audio.play().then(() => {
+      isAudioPlaying = true;
+      audioControl.textContent = '🔊';
+    }).catch(() => {
+      isAudioPlaying = false;
+      audioControl.textContent = '🔈';
+    });
+  }
+
+  audioControl.onclick = () => {
+    if(!audio) return;
+    if(isAudioPlaying) {
+      audio.pause();
+      isAudioPlaying = false;
+      audioControl.textContent = '🔈';
+    } else {
+      audio.play();
+      isAudioPlaying = true;
+      audioControl.textContent = '🔊';
+    }
+  };
+
+  // Tema değişimi
+  function toggleTheme() {
+    darkMode = !darkMode;
+    if(darkMode) {
+      document.body.style.background = '#000';
+      scene.background = new THREE.TextureLoader().load('https://i.imgur.com/saBY0cK.jpeg');
+      audioControl.style.color = '#ff77aa';
+      themeToggle.textContent = '🌙';
+      footer.style.color = '#ff77aa';
+    } else {
+      document.body.style.background = '#f0f0f0';
+      scene.background = new THREE.Color(0xf0f0f0);
+      audioControl.style.color = '#b3004b';
+      themeToggle.textContent = '☀️';
+      footer.style.color = '#b3004b';
+    }
+  }
+  themeToggle.onclick = toggleTheme;
+
+  // Kalp patlatma
+  function burstHearts(x, y) {
+    if(!scene) return;
+
+    const mouseVector = new THREE.Vector3(
+      (x / window.innerWidth) * 2 - 1,
+      - (y / window.innerHeight) * 2 + 1,
+      0.5
+    );
+
+    mouseVector.unproject(camera);
+    const dir = mouseVector.sub(camera.position).normalize();
+    const distance = -camera.position.z / dir.z;
+    const pos = camera.position.clone().add(dir.multiplyScalar(distance));
+
+    for(let i=0; i<10; i++) { // patlatma sayısını da azalttım
+      const geometry = createHeartGeometry();
+      const material = createHeartMaterial();
+
+      const heartMesh = new THREE.Mesh(geometry, material);
+      heartMesh.position.set(
+        pos.x + (Math.random() - 0.5) * 0.6,
+        pos.y + (Math.random() - 0.5) * 0.6,
+        pos.z + (Math.random() - 0.5) * 0.6
+      );
+
+      const scale = 0.2 + Math.random() * 0.3;
+      heartMesh.scale.set(scale, scale, scale);
+
+      heartMesh.userData = {
+        rotationSpeedX: (Math.random() - 0.5) * 0.08,
+        rotationSpeedY: (Math.random() - 0.5) * 0.08,
+        fallSpeed: 0.04 + Math.random() * 0.03,
+        lifeTime: 1500 + Math.random() * 700,
+        birthTime: performance.now()
+      };
+
+      scene.add(heartMesh);
+      hearts.push(heartMesh);
+    }
+  }
+
+  // Animate fonksiyonunu optimize edelim
+  const oldAnimate = () => {
+    requestAnimationFrame(oldAnimate);
+    const now = performance.now();
+
+    for(let i = hearts.length - 1; i >= 0; i--) {
+      const heart = hearts[i];
+      heart.position.y -= heart.userData.fallSpeed || 0.01;
+      heart.rotation.x += heart.userData.rotationSpeedX || 0.01;
+      heart.rotation.y += heart.userData.rotationSpeedY || 0.01;
+
+      if(heart.userData.lifeTime) {
+        if(now - heart.userData.birthTime > heart.userData.lifeTime) {
+          scene.remove(heart);
+          hearts.splice(i,1);
+          continue;
+        }
+      } else if(heart.position.y < -7) {
+        heart.position.y = 6 + Math.random() * 3;
+        heart.position.x = (Math.random() - 0.5) * 10;
+        heart.position.z = (Math.random() - 0.5) * 6;
+      }
+    }
+
+    renderer.render(scene, camera);
+  };
+
+  let animate = oldAnimate;
+
+  // Giriş sonrası animasyonu başlat
+  loginBtn.onclick = () => {
+    const user = document.getElementById('username').value.trim();
+    const pass = document.getElementById('password').value.trim();
+
+    if(user === 'x' && pass === '11097') {
+      loginDiv.style.display = 'none';
+      footer.style.display = 'block';
+
+      initThree();
+      showCountdownAndStart();
+      setupAudio();
+
+      audioControl.classList.remove('hidden');
+      themeToggle.classList.remove('hidden');
+
+      window.addEventListener('resize', onWindowResize);
+      window.addEventListener('click', e => burstHearts(e.clientX, e.clientY));
+      window.addEventListener('touchstart', e => {
+        if(e.touches.length > 0) burstHearts(e.touches[0].clientX, e.touches[0].clientY);
+      });
+    } else {
+      alert('Hatalı kullanıcı adı veya şifre!');
+    }
+  };
+  animate();
+})();
+</script>
+
+</body>
+</html>
