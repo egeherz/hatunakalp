@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <title>❤️</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      overflow: hidden;
+      font-family: 'Arial', sans-serif;
+    }
+
+    body {
+      background: url('https://i.imgur.com/saBY0cK.jpeg') no-repeat center center fixed;
+      background-size: cover;
+    }
+
+    #startBtn {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      padding: 16px 32px;
+      font-size: 20px;
+      background-color: #ff0033;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      z-index: 10;
+      box-shadow: 0 0 20px #ff0033;
+      transition: background 0.3s;
+    }
+
+    #startBtn:hover {
+      background-color: #cc0022;
+    }
+
+    canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      display: none;
+      z-index: 5;
+    }
+  </style>
+</head>
+<body>
+  <button id="startBtn">Başlat 💖</button>
+  <canvas id="canva"></canvas>
+
+  <script>
+    const startBtn = document.getElementById('startBtn');
+    const canvas = document.getElementById('canva');
+    const ctx = canvas.getContext('2d');
+
+    startBtn.addEventListener('click', () => {
+      startBtn.style.display = 'none';
+      canvas.style.display = 'block';
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      initParticles();
+      animate();
+    });
+
+    const particles = [];
+    const heart = t => {
+      const x = 16 * Math.pow(Math.sin(t), 3);
+      const y = 13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t);
+      return [x, -y];
+    };
+
+    function initParticles() {
+      for (let i = 0; i < 1000; i++) {
+        const angle = Math.random() * 2 * Math.PI;
+        const [hx, hy] = heart(angle);
+        const isHeart = i < 400;
+        particles.push({
+          x: canvas.width / 2 + hx * 15 + (isHeart ? Math.random() * 5 : (Math.random() - 0.5) * 300),
+          y: canvas.height / 2 + hy * 15 + (isHeart ? Math.random() * 5 : (Math.random() - 0.5) * 300),
+          vx: (Math.random() - 0.5) * 1.2,
+          vy: (Math.random() - 0.5) * 1.2,
+          radius: Math.random() * 2 + 1,
+          color: isHeart ? 'rgba(255,0,100,0.9)' : 'rgba(255,255,255,0.7)',
+          glow: isHeart ? '#ff0055' : '#ffffff'
+        });
+      }
+    }
+
+    function animate() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      for (let p of particles) {
+        ctx.beginPath();
+        ctx.shadowBlur = 10;
+        ctx.shadowColor = p.glow;
+        ctx.fillStyle = p.color;
+        ctx.arc(p.x, p.y, p.radius, 0, 2 * Math.PI);
+        ctx.fill();
+
+        p.x += p.vx;
+        p.y += p.vy;
+
+        if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
+        if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
+      }
+
+      // Mesaj
+      ctx.shadowBlur = 0;
+      ctx.font = 'bold 28px Arial';
+      ctx.fillStyle = '#ff99cc';
+      ctx.textAlign = 'center';
+      ctx.fillText('Senin kalbinde kayboldum ❤️', canvas.width / 2, canvas.height - 60);
+
+      requestAnimationFrame(animate);
+    }
+  </script>
+</body>
+</html>
