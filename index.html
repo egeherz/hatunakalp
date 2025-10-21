@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Telegram Klonu (Kanka Test - Tek Dosya)</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <style>
+        /* Genel Sıfırlama */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        :root {
+            --telegram-blue: #5682A3;
+            --dark-grey: #64748b;
+            --light-bg: #f5f5f5;
+            --border-color: #e2e8f0;
+            --unread-green: #4CAF50;
+        }
+
+        body {
+            background-color: var(--light-bg);
+        }
+
+        .app-container {
+            display: flex;
+            height: 100vh;
+            max-width: 1400px;
+            margin: 0 auto;
+            border-left: 1px solid var(--border-color);
+            border-right: 1px solid var(--border-color);
+        }
+
+        /* ------------------------------------------------ */
+        /* Sol Sütun: Sohbet Listesi */
+        /* ------------------------------------------------ */
+
+        .chat-list {
+            width: 380px;
+            min-width: 300px;
+            background-color: white;
+            border-right: 1px solid var(--border-color);
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-list-header {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            background-color: white;
+            z-index: 10;
+        }
+
+        .menu-icon {
+            font-size: 20px;
+            color: var(--dark-grey);
+            cursor: pointer;
+            margin-right: 15px;
+        }
+
+        .search-input {
+            flex-grow: 1;
+            padding: 8px 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            font-size: 14px;
+            outline: none;
+        }
+
+        /* Sohbet Öğesi */
+        .chat-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            border-bottom: 1px solid #f0f0f0;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .chat-item:hover {
+            background-color: #f5f9ff;
+        }
+
+        .chat-item.active {
+            background-color: #eaf2ff;
+        }
+
+        .avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: var(--telegram-blue);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: bold;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+
+        .chat-info {
+            flex-grow: 1;
+            min-width: 0;
+        }
+
+        .chat-name {
+            font-weight: 600;
+            color: #1a1a1a;
+            display: block;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .last-message {
+            color: var(--dark-grey);
+            font-size: 14px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .chat-meta {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            margin-left: 10px;
+            flex-shrink: 0;
+        }
+
+        .time {
+            font-size: 12px;
+            color: var(--dark-grey);
+        }
+
+        .unread-count {
+            background-color: var(--unread-green);
+            color: white;
+            font-size: 10px;
+            padding: 3px 6px;
+            border-radius: 10px;
+            margin-top: 4px;
+            font-weight: 500;
+        }
+
+
+        /* ------------------------------------------------ */
+        /* Sağ Sütun: Sohbet Penceresi */
+        /* ------------------------------------------------ */
+
+        .chat-window {
+            flex-grow: 1;
+            background-color: var(--light-bg);
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Varsayılan Hoş Geldin Mesajı */
+        .chat-window-content {
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .welcome-message h1 {
+            font-size: 28px;
+            color: var(--dark-grey);
+            margin-bottom: 10px;
+        }
+
+        .welcome-message p {
+            color: var(--dark-grey);
+            font-size: 16px;
+        }
+
+        /* Mesaj Giriş Alanı */
+        .message-input-area {
+            display: flex;
+            align-items: center;
+            padding: 10px 20px;
+            background-color: white;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .message-input {
+            flex-grow: 1;
+            padding: 10px;
+            border: none;
+            outline: none;
+            font-size: 16px;
+        }
+
+        .message-input-area .icon {
+            font-size: 22px;
+            color: var(--dark-grey);
+            margin: 0 10px;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .message-input-area .icon:hover {
+            color: var(--telegram-blue);
+        }
+
+        /* ------------------------------------------------ */
+        /* Responsiveness (Mobil Uyum) */
+        /* ------------------------------------------------ */
+
+        @media (max-width: 768px) {
+            /* Mobil cihazlarda sadece sohbet listesini göster */
+            .chat-list {
+                width: 100%;
+                border-right: none;
+            }
+            
+            /* Mobil cihazlarda sohbet penceresini gizle */
+            .chat-window {
+                display: none; 
+            }
+            
+            .menu-icon {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        
+        <div class="chat-list">
+            
+            <header class="chat-list-header">
+                <i class="fas fa-bars menu-icon"></i>
+                <input type="text" placeholder="Sohbetlerde ara..." class="search-input">
+            </header>
+
+            <div class="chat-item active">
+                <div class="avatar">K</div>
+                <div class="chat-info">
+                    <span class="chat-name">Kanka Proje Test</span>
+                    <p class="last-message">Selam, bu ilk mesaj.</p>
+                </div>
+                <div class="chat-meta">
+                    <span class="time">10:30</span>
+                    <span class="unread-count">3</span>
+                </div>
+            </div>
+
+            <div class="chat-item">
+                <div class="avatar" style="background-color: #f7a14e;">A</div>
+                <div class="chat-info">
+                    <span class="chat-name">Arkadaşın Ali</span>
+                    <p class="last-message">Tamamdır, yarın görüşürüz.</p>
+                </div>
+                <div class="chat-meta">
+                    <span class="time">Dün</span>
+                </div>
+            </div>
+            
+            <div class="chat-item">
+                <div class="avatar" style="background-color: #2da1f8;">T</div>
+                <div class="chat-info">
+                    <span class="chat-name">Telegram Destek</span>
+                    <p class="last-message">Hoş geldin!</p>
+                </div>
+                <div class="chat-meta">
+                    <span class="time">15.01</span>
+                </div>
+            </div>
+
+            </div>
+        
+        <div class="chat-window">
+            <div class="chat-window-content">
+                <div class="welcome-message">
+                    <h1>Telegram Web Klonu</h1>
+                    <p>Başlamak için sol taraftan bir sohbet seçin.</p>
+                </div>
+            </div>
+            
+            <div class="message-input-area">
+                <i class="far fa-smile icon"></i>
+                <input type="text" placeholder="Mesaj yaz..." class="message-input">
+                <i class="fas fa-paperclip icon"></i>
+                <i class="fas fa-microphone icon"></i>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>
