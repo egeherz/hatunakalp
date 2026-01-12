@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EGE HABER | Canlı Haber Akışı</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* --- MODERN CSS TASARIM V7 --- */
+        :root {
+            --primary: #e63946; /* Modern Kırmızı */
+            --secondary: #1d3557; /* Koyu Lacivert */
+            --telegram: #0088cc; /* Telegram Mavisi */
+            --bg: #f1f5f9;
+            --card-bg: #ffffff;
+            --text-dark: #1e293b;
+            --text-light: #64748b;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--text-dark);
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* ÜST BİLGİ ÇUBUĞU */
+        .top-bar {
+            background: var(--secondary);
+            color: #fff;
+            padding: 10px 0;
+            font-size: 13px;
+            font-weight: 500;
+        }
+        .top-inner {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .live-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255,255,255,0.1);
+            padding: 4px 12px;
+            border-radius: 20px;
+        }
+        .dot {
+            width: 8px; height: 8px;
+            background-color: #22c55e;
+            border-radius: 50%;
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse { 0% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(1.2); } 100% { opacity: 1; transform: scale(1); } }
+
+        /* HEADER */
+        header {
+            background: var(--card-bg);
+            border-bottom: 1px solid #e2e8f0;
+            position: sticky;
+            top: 0;
+            z-index: 999;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 80px;
+        }
+        .logo {
+            font-size: 28px;
+            font-weight: 900;
+            color: var(--secondary);
+            text-transform: uppercase;
+            letter-spacing: -1px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .logo span { color: var(--primary); }
+
+        nav ul { display: flex; gap: 5px; padding: 0; margin: 0; list-style: none; }
+        nav a {
+            text-decoration: none;
+            color: var(--text-dark);
+            font-weight: 600;
+            font-size: 14px;
+            padding: 10px 16px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        nav a:hover { background: #f1f5f9; color: var(--primary); }
+        nav a.active { background: var(--primary); color: white; }
+
+        /* ANA YAPI */
+        .layout-grid {
+            display: grid;
+            grid-template-columns: 3fr 1fr;
+            gap: 40px;
+            margin-top: 40px;
+            margin-bottom: 60px;
+        }
+
+        /* HABER KARTLARI */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            border-left: 5px solid var(--primary);
+            padding-left: 15px;
+        }
+        .section-title { font-size: 24px; font-weight: 800; color: var(--secondary); margin: 0; }
+        
+        .news-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .news-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        .news-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            border-color: var(--primary);
+        }
+        .img-wrapper {
+            position: relative;
+            padding-top: 60%; /* 16:9 Aspect Ratio */
+            background: #cbd5e1;
+        }
+        .news-img {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            object-fit: cover;
+        }
+        .source-tag {
+            position: absolute;
+            top: 15px; right: 15px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            backdrop-filter: blur(4px);
+        }
+        .card-body { padding: 20px; flex-grow: 1; display: flex; flex-direction: column; }
+        .date { font-size: 12px; color: var(--text-light); margin-bottom: 10px; display: block; }
+        .headline {
+            font-size: 18px;
+            font-weight: 700;
+            margin: 0 0 15px 0;
+            color: var(--text-dark);
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .read-more {
+            margin-top: auto;
+            color: var(--primary);
+            font-weight: 700;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* SIDEBAR / TELEGRAM */
+        .sidebar-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            border: 1px solid #e2e8f0;
+            position: sticky;
+            top: 110px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+        .avatar-container {
+            width: 100px; height: 100px;
+            margin: 0 auto 15px;
+            position: relative;
+        }
+        .avatar {
+            width: 100%; height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid #fff;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .verified {
+            position: absolute;
+            bottom: 5px; right: 0;
+            color: #3b82f6;
+            background: white;
+            border-radius: 50%;
+            font-size: 20px;
+        }
+        .user-name { font-size: 20px; font-weight: 800; color: var(--secondary); margin: 0; }
+        .user-role { font-size: 12px; color: var(--text-light); font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 20px; }
+        
+        /* Telegram Butonu */
+        .telegram-btn {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            background-color: var(--telegram);
+            color: white;
+            text-decoration: none;
+            padding: 14px;
+            border-radius: 12px;
+            font-weight: 700;
+            transition: 0.3s;
+            box-shadow: 0 4px 14px rgba(0, 136, 204, 0.3);
+        }
+        .telegram-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 136, 204, 0.4);
+            background-color: #0077b5;
+        }
+
+        /* MODAL (DETAY) */
+        .modal {
+            display: none;
+            position: fixed; z-index: 10000;
+            left: 0; top: 0; width: 100%; height: 100%;
+            background-color: rgba(15, 23, 42, 0.9);
+            justify-content: center; align-items: center;
+            backdrop-filter: blur(8px);
+        }
+        .modal-content {
+            background-color: #fff;
+            width: 90%; max-width: 700px;
+            border-radius: 20px;
+            padding: 30px;
+            position: relative;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        @keyframes slideUp { from {transform: translateY(100px); opacity: 0;} to {transform: translateY(0); opacity: 1;} }
+        
+        .close-modal {
+            position: absolute; top: 20px; right: 25px;
+            font-size: 30px; cursor: pointer; color: #94a3b8;
+            transition: 0.3s;
+        }
+        .close-modal:hover { color: var(--primary); }
+
+        .modal-img {
+            width: 100%; height: 300px;
+            object-fit: cover; border-radius: 12px;
+            margin-bottom: 20px;
+        }
+        .modal-title { font-size: 24px; font-weight: 800; color: var(--secondary); margin-bottom: 15px; line-height: 1.3; }
+        .modal-text { font-size: 16px; color: #334155; line-height: 1.8; margin-bottom: 25px; }
+        
+        .source-btn {
+            display: inline-block;
+            background: var(--primary);
+            color: white;
+            padding: 12px 25px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 700;
+            width: 100%;
+            text-align: center;
+            transition: 0.3s;
+        }
+        .source-btn:hover { background: #d90429; }
+
+        /* Mobil Uyum */
+        @media (max-width: 768px) {
+            .layout-grid { grid-template-columns: 1fr; gap: 30px; }
+            .header-content { flex-direction: column; height: auto; padding: 15px 0; gap: 15px; }
+            nav ul { flex-wrap: wrap; justify-content: center; }
+            .sidebar-card { position: static; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="top-bar">
+        <div class="container top-inner">
+            <span id="current-date">Yükleniyor...</span>
+            <div class="live-indicator">
+                <div class="dot"></div>
+                <span>CANLI YAYIN</span>
+            </div>
+        </div>
+    </div>
+
+    <header>
+        <div class="container header-content">
+            <div class="logo" onclick="location.reload()">
+                <i class="fas fa-globe" style="color:var(--primary)"></i>
+                EGE<span>HABER</span>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="#" class="active" onclick="loadNews('karisik', this)">Tümü</a></li>
+                    <li><a href="#" onclick="loadNews('gundem', this)">Gündem</a></li>
+                    <li><a href="#" onclick="loadNews('spor', this)">Spor</a></li>
+                    <li><a href="#" onclick="loadNews('ekonomi', this)">Ekonomi</a></li>
+                    <li><a href="#" onclick="loadNews('teknoloji', this)">Teknoloji</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <div class="container layout-grid">
+        
+        <main>
+            <div class="section-header">
+                <h2 class="section-title" id="cat-title">Son Dakika Gelişmeleri</h2>
+            </div>
+            
+            <div id="news-grid" class="news-grid">
+                <div style="text-align:center; grid-column: 1/-1; padding: 50px;">
+                    <i class="fas fa-circle-notch fa-spin" style="font-size:30px; color:var(--primary)"></i>
+                    <p>Haberler Yükleniyor...</p>
+                </div>
+            </div>
+        </main>
+
+        <aside>
+            <div class="sidebar-card">
+                <div class="avatar-container">
+                    <img src="https://ui-avatars.com/api/?name=Ege+Herz&background=0f172a&color=fff&size=256" alt="Ege Herz" class="avatar">
+                    <i class="fas fa-check-circle verified"></i>
+                </div>
+                <h3 class="user-name">Ege Herz</h3>
+                <div class="user-role">Genel Yayın Yönetmeni</div>
+                <p style="font-size:14px; color:#64748b; margin-bottom:25px;">
+                    Doğru haber, tarafsız yorum. Anlık gelişmeler için Telegram kanalıma katılın.
+                </p>
+                
+                <a href="https://t.me/hicligim" target="_blank" class="telegram-btn">
+                    <i class="fab fa-telegram-plane" style="font-size:20px;"></i>
+                    Telegram'a Katıl
+                </a>
+            </div>
+        </aside>
+
+    </div>
+
+    <div id="newsModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal()">&times;</span>
+            <img id="m-img" src="" class="modal-img">
+            <h2 id="m-title" class="modal-title"></h2>
+            
+            <div id="m-desc" class="modal-text"></div>
+            
+            <a id="m-link" href="#" target="_blank" class="source-btn">
+                Haberi Kaynağından Oku <i class="fas fa-external-link-alt" style="margin-left:5px;"></i>
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // --- 1. SAAT VE TARİH ---
+        function updateDate() {
+            const now = new Date();
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+            document.getElementById('current-date').textContent = now.toLocaleDateString('tr-TR', options);
+        }
+        setInterval(updateDate, 1000);
+        updateDate();
+
+        // --- 2. YEDEK HABERLER (Offline Durumu İçin) ---
+        const backupNews = [
+            {
+                title: "İnternet Bağlantınızı Kontrol Edin",
+                description: "Şu anda güncel haberlere erişilemiyor. Lütfen internet bağlantınızı kontrol edip sayfayı yenileyin.",
+                thumbnail: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=800&q=80",
+                link: "#",
+                pubDate: new Date(),
+                source: "SİSTEM"
+            }
+        ];
+
+        // --- 3. RSS KAYNAKLARI (GÜNCEL & TÜRKÇE) ---
+        // Spor için NTV Spor, Teknoloji için DonanımHaber gibi daha iyi kaynaklar
+        const feeds = {
+            'karisik': 'https://www.cnnturk.com/feed/66/index.rss',
+            'gundem': 'https://www.trthaber.com/xml/sondakika.xml',
+            'spor': 'https://www.ntvspor.net/rss', // Daha iyi spor kaynağı
+            'ekonomi': 'https://www.bloomberght.com/rss',
+            'teknoloji': 'https://www.donanimhaber.com/rss/tum/'
+        };
+
+        async function loadNews(category, btnElement) {
+            // Buton Aktifliği
+            if(btnElement) {
+                document.querySelectorAll('nav a').forEach(el => el.classList.remove('active'));
+                btnElement.classList.add('active');
+            }
+            
+            // Başlık Güncelle
+            const titles = {'karisik': 'Tüm Manşetler', 'gundem': 'Gündem', 'spor': 'Spor Haberleri', 'ekonomi': 'Ekonomi', 'teknoloji': 'Teknoloji'};
+            document.getElementById('cat-title').textContent = titles[category] || 'Haberler';
+
+            const grid = document.getElementById('news-grid');
+            grid.innerHTML = '<div style="text-align:center; padding:50px; grid-column:1/-1"><i class="fas fa-circle-notch fa-spin" style="font-size:30px; color:var(--primary)"></i></div>';
+
+            const rssUrl = feeds[category] || feeds['karisik'];
+            // API Cache engellemek için random parametre ekliyoruz
+            const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}&api_key=q536306509170288806085&count=20`; 
+            // Not: API Key public/free keydir, bazen limit dolabilir.
+
+            try {
+                const response = await fetch(apiUrl);
+                const data = await response.json();
+
+                if (data.status === 'ok' && data.items.length > 0) {
+                    renderCards(data.items, category);
+                } else {
+                    renderCards(backupNews, 'Hata');
+                }
+            } catch (error) {
+                console.error("Haber çekme hatası:", error);
+                renderCards(backupNews, 'Bağlantı Hatası');
+            }
+        }
+
+        function renderCards(items, category) {
+            const grid = document.getElementById('news-grid');
+            grid.innerHTML = "";
+
+            items.forEach(item => {
+                // Görsel Bulma Mantığı (Enclosure yoksa description içinden bul)
+                let image = "https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&q=80"; // Varsayılan
+                
+                if (item.thumbnail && item.thumbnail.startsWith('http')) {
+                    image = item.thumbnail;
+                } else if (item.enclosure && item.enclosure.link) {
+                    image = item.enclosure.link;
+                } else {
+                    // Description içindeki img tagini regex ile ara
+                    const imgMatch = item.description.match(/<img[^>]+src="([^">]+)"/);
+                    if(imgMatch) image = imgMatch[1];
+                }
+
+                // Tarih formatı
+                const dateObj = new Date(item.pubDate);
+                const timeStr = dateObj.toLocaleTimeString('tr-TR', {hour:'2-digit', minute:'2-digit'});
+
+                // Kart HTML
+                const card = document.createElement('div');
+                card.className = 'news-card';
+                // Tıklayınca Modal Açma Fonksiyonuna tüm veriyi gönder
+                // Description'daki tırnak işaretlerini kaçırmak için encodeURIComponent kullanabiliriz ama basit string replace yeterli
+                card.onclick = () => openModal(item.title, item.description, image, item.link);
+
+                card.innerHTML = `
+                    <div class="img-wrapper">
+                        <img src="${image}" class="news-img" loading="lazy" onerror="this.src='https://via.placeholder.com/400x250?text=Ege+Haber'">
+                        <span class="source-tag">${category.toUpperCase()}</span>
+                    </div>
+                    <div class="card-body">
+                        <span class="date"><i class="far fa-clock"></i> ${timeStr}</span>
+                        <h3 class="headline">${item.title}</h3>
+                        <div class="read-more">
+                            Detayı Gör <i class="fas fa-arrow-right"></i>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // --- 4. MODAL MANTIĞI ---
+        const modal = document.getElementById('newsModal');
+        
+        function openModal(title, description, image, link) {
+            document.getElementById('m-title').textContent = title;
+            document.getElementById('m-img').src = image;
+            document.getElementById('m-link').href = link;
+
+            // HTML İçeriğini Temizleme ve Yerleştirme
+            // RSS'den gelen açıklama bazen kirli olabilir, basit temizlik yapalım
+            const descDiv = document.getElementById('m-desc');
+            
+            // Eğer description çok kısaysa uyarı ekle
+            if(!description || description.length < 50) {
+                 descDiv.innerHTML = "<p>Haberin detayları için aşağıdaki butona tıklayarak kaynağa gidiniz.</p>";
+            } else {
+                // Description içindeki img taglerini gizle (zaten yukarıda büyük resim var)
+                let cleanDesc = description.replace(/<img[^>]*>/g,"");
+                // Linkleri yeni sekmede açtır
+                cleanDesc = cleanDesc.replace(/<a /g, '<a target="_blank" style="color:var(--primary); font-weight:bold;" ');
+                
+                descDiv.innerHTML = cleanDesc;
+            }
+
+            modal.style.display = "flex";
+            document.body.style.overflow = "hidden"; // Arka plan kaymasını engelle
+        }
+
+        function closeModal() {
+            modal.style.display = "none";
+            document.body.style.overflow = "auto";
+        }
+
+        // Modal dışına tıklayınca kapat
+        window.onclick = function(e) {
+            if (e.target == modal) closeModal();
+        }
+
+        // Başlangıçta çalıştır
+        loadNews('karisik', document.querySelector('nav a'));
+
+    </script>
+</body>
+</html>
