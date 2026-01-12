@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EGE HABER | Yeni Nesil Dijital Medya</title>
+    <meta name="description" content="Son dakika haberleri, güncel gelişmeler ve Ege Herz'in özel içerikleri.">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* --- CSS BAŞLANGIÇ --- */
+        :root {
+            --primary: #e74c3c; /* Haber Kırmızısı */
+            --dark: #2c3e50;
+            --light: #ffffff;
+            --bg: #f4f6f8;
+            --text: #34495e;
+            --blue-tick: #3897f0;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+
+        a { text-decoration: none; color: inherit; transition: 0.3s; }
+        ul { list-style: none; padding: 0; margin: 0; }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+
+        /* Üst Bilgi Barı */
+        .top-bar {
+            background: #1a252f;
+            color: #bdc3c7;
+            font-size: 12px;
+            padding: 8px 0;
+        }
+        .top-bar .container { display: flex; justify-content: space-between; align-items: center; }
+        .socials a { color: #fff; margin-left: 15px; }
+        .socials a:hover { color: var(--primary); }
+
+        /* Ana Header */
+        header {
+            background: var(--light);
+            box-shadow: 0 2px 15px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        .header-inner {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 75px;
+        }
+        .logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 30px;
+            font-weight: 700;
+            color: var(--dark);
+            letter-spacing: -1px;
+        }
+        .logo span { color: var(--primary); }
+
+        nav ul { display: flex; gap: 20px; }
+        nav a {
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 13px;
+            color: var(--dark);
+            position: relative;
+        }
+        nav a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary);
+            transition: 0.3s;
+        }
+        nav a:hover::after { width: 100%; }
+
+        /* Kayan Yazı (Ticker) */
+        .ticker-wrap {
+            background: var(--dark);
+            color: #fff;
+            display: flex;
+            height: 40px;
+            overflow: hidden;
+            border-bottom: 3px solid var(--primary);
+        }
+        .ticker-heading {
+            background: var(--primary);
+            padding: 0 20px;
+            display: flex;
+            align-items: center;
+            font-weight: bold;
+            font-size: 12px;
+            text-transform: uppercase;
+            z-index: 2;
+        }
+        .ticker {
+            display: flex;
+            align-items: center;
+            padding-left: 20px;
+            animation: ticker 20s linear infinite;
+            white-space: nowrap;
+        }
+        @keyframes ticker {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
+
+        /* Ana Düzen */
+        .main-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr; /* Sol geniş, sağ dar */
+            gap: 30px;
+            margin-top: 30px;
+            margin-bottom: 50px;
+        }
+
+        /* Sol Taraf: Haberler */
+        .section-title {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .section-title h2 {
+            margin: 0;
+            font-size: 22px;
+            color: var(--dark);
+            border-left: 5px solid var(--primary);
+            padding-left: 15px;
+        }
+
+        .news-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+        }
+
+        .news-card {
+            background: var(--light);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+            transition: transform 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+        .news-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.08); }
+
+        .news-img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+        }
+        .news-body { padding: 15px; flex-grow: 1; display: flex; flex-direction: column; }
+        .news-date { font-size: 11px; color: #95a5a6; margin-bottom: 8px; display: block; }
+        .news-title {
+            font-size: 16px;
+            font-weight: 700;
+            margin: 0 0 10px 0;
+            line-height: 1.4;
+            color: var(--dark);
+        }
+        .read-more {
+            margin-top: auto;
+            color: var(--primary);
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        /* Sağ Taraf: Sidebar */
+        .widget {
+            background: var(--light);
+            padding: 25px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+            position: relative;
+        }
+
+        /* Profil Kartı Özel Tasarım */
+        .author-widget {
+            text-align: center;
+            border-top: 4px solid var(--primary);
+        }
+        .imtiyaz-badge {
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--primary);
+            color: white;
+            font-size: 10px;
+            padding: 3px 10px;
+            border-radius: 10px;
+            font-weight: bold;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        .profile-img-wrap {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            margin: 10px auto;
+        }
+        .profile-img-wrap img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 3px solid #f1f1f1;
+            object-fit: cover;
+        }
+        .verified-badge {
+            position: absolute;
+            bottom: 5px;
+            right: 0;
+            background: #fff;
+            color: var(--blue-tick);
+            border-radius: 50%;
+            font-size: 20px;
+            border: 2px solid white;
+        }
+        .author-name { font-size: 18px; font-weight: 700; margin: 5px 0; color: var(--dark); }
+        .author-role { color: var(--primary); font-size: 12px; font-weight: bold; text-transform: uppercase; margin-bottom: 10px; }
+        .author-bio { font-size: 13px; color: #7f8c8d; margin-bottom: 15px; line-height: 1.5; }
+        .insta-btn {
+            display: block;
+            background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+            color: white;
+            padding: 10px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 13px;
+            transition: opacity 0.3s;
+        }
+        .insta-btn:hover { opacity: 0.9; }
+
+        /* Reklam ve Kategori Widget */
+        .ad-widget {
+            background: repeating-linear-gradient(45deg, #ecf0f1, #ecf0f1 10px, #bdc3c7 10px, #bdc3c7 20px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 250px;
+            color: #7f8c8d;
+            font-weight: bold;
+            text-shadow: 1px 1px 0 #fff;
+            border: 2px dashed #95a5a6;
+        }
+        .cat-list li {
+            border-bottom: 1px solid #eee;
+            padding: 10px 0;
+        }
+        .cat-list li:last-child { border-bottom: none; }
+        .cat-list a { display: flex; justify-content: space-between; font-size: 14px; color: var(--dark); }
+        .cat-list a:hover { color: var(--primary); }
+
+        /* Footer */
+        footer {
+            background: #1a252f;
+            color: #ecf0f1;
+            text-align: center;
+            padding: 40px 0;
+            margin-top: auto;
+        }
+        footer p { font-size: 13px; opacity: 0.7; }
+
+        /* Loading */
+        .loader {
+            text-align: center;
+            width: 100%;
+            padding: 40px;
+            grid-column: 1 / -1;
+            color: #7f8c8d;
+        }
+
+        /* Mobil Uyum */
+        @media (max-width: 768px) {
+            .main-content { grid-template-columns: 1fr; }
+            .header-inner { flex-direction: column; height: auto; padding: 15px 0; }
+            nav ul { margin-top: 15px; font-size: 12px; gap: 15px; }
+            .ticker-heading { font-size: 10px; padding: 0 10px; }
+        }
+        /* --- CSS BİTİŞ --- */
+    </style>
+</head>
+<body>
+
+    <div class="top-bar">
+        <div class="container">
+            <span id="date-display"></span>
+            <div class="socials">
+                <a href="#"><i class="fab fa-twitter"></i></a>
+                <a href="#"><i class="fab fa-youtube"></i></a>
+            </div>
+        </div>
+    </div>
+
+    <header>
+        <div class="container header-inner">
+            <div class="logo">EGE<span>HABER</span></div>
+            <nav>
+                <ul>
+                    <li><a href="#">Gündem</a></li>
+                    <li><a href="#">Ekonomi</a></li>
+                    <li><a href="#">Spor</a></li>
+                    <li><a href="#">Magazin</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <div class="ticker-wrap">
+        <div class="ticker-heading">SON DAKİKA</div>
+        <div class="ticker">
+            <div class="ticker-item">Ege Haber Yayında! • Türkiye ve dünyadan en sıcak gelişmeler anlık olarak ekranınızda. • Ege Herz: "Tarafsız haberciliğin yeni adresi." • Piyasalar güne nasıl başladı?</div>
+        </div>
+    </div>
+
+    <div class="container main-content">
+        <main>
+            <div class="section-title">
+                <h2>Günün Başlıkları</h2>
+            </div>
+            <div id="news-grid" class="news-grid">
+                <div class="loader"><i class="fas fa-spinner fa-spin"></i> Haberler Yükleniyor...</div>
+            </div>
+        </main>
+
+        <aside>
+            <div class="widget author-widget">
+                <div class="imtiyaz-badge">İMTİYAZ SAHİBİ</div>
+                <div class="profile-img-wrap">
+                    <img src="https://ui-avatars.com/api/?name=Ege+Herz&background=c0392b&color=fff&size=150" alt="Ege Herz">
+                    <i class="fas fa-check-circle verified-badge"></i>
+                </div>
+                <h3 class="author-name">Ege Herz</h3>
+                <div class="author-role">GENEL YAYIN YÖNETMENİ</div>
+                <p class="author-bio">Girişimci, Yazılımcı. Ege Haber ile dijital medyada yeni bir soluk. Doğru haber, hızlı analiz.</p>
+                <a href="https://instagram.com/egeherz" target="_blank" class="insta-btn">
+                    <i class="fab fa-instagram"></i> Instagram'da Takip Et
+                </a>
+            </div>
+
+            <div class="widget ad-widget">
+                <div style="text-align:center">
+                    <i class="fas fa-ad fa-2x"></i><br>
+                    REKLAM ALANI<br>
+                    <span style="font-size:12px; font-weight:normal">Buraya reklam gelebilir</span>
+                </div>
+            </div>
+
+            <div class="widget">
+                <h4 style="margin-top:0; border-bottom:2px solid #eee; padding-bottom:10px;">Kategoriler</h4>
+                <ul class="cat-list">
+                    <li><a href="#">Siyaset <span>(14)</span></a></li>
+                    <li><a href="#">Teknoloji <span>(8)</span></a></li>
+                    <li><a href="#">Yaşam <span>(22)</span></a></li>
+                </ul>
+            </div>
+        </aside>
+    </div>
+
+    <footer>
+        <div class="container">
+            <h3>EGE<span>HABER</span></h3>
+            <p>Copyright © 2026 Ege Haber. Tüm hakları saklıdır. <br> Yazılım & Tasarım: Ege Herz</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            
+            // 1. Tarihi Ayarla
+            const dateDisplay = document.getElementById("date-display");
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            dateDisplay.textContent = new Date().toLocaleDateString('tr-TR', options);
+
+            // 2. Haberleri Çek (RSS)
+            const newsGrid = document.getElementById("news-grid");
+            const rssUrl = "https://www.cnnturk.com/feed/66/index.rss"; // CNN Türk Son Dakika
+            const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}`;
+
+            fetch(apiUrl)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'ok') {
+                        newsGrid.innerHTML = ""; // Yükleniyor yazısını kaldır
+                        
+                        // İlk 12 Haberi Listele
+                        data.items.slice(0, 12).forEach(item => {
+                            
+                            // Görsel Bulma Mantığı
+                            let imgUrl = "https://images.unsplash.com/photo-1504711434969-e33886168f5c?auto=format&fit=crop&w=500&q=60"; // Varsayılan
+                            
+                            if (item.thumbnail && item.thumbnail.startsWith("http")) {
+                                imgUrl = item.thumbnail;
+                            } else if (item.enclosure && item.enclosure.link) {
+                                imgUrl = item.enclosure.link;
+                            }
+
+                            // Tarih Formatı
+                            const time = new Date(item.pubDate).toLocaleTimeString('tr-TR', {hour: '2-digit', minute:'2-digit'});
+
+                            const card = `
+                                <div class="news-card">
+                                    <a href="${item.link}" target="_blank">
+                                        <img src="${imgUrl}" class="news-img" alt="Haber" onerror="this.src='https://via.placeholder.com/500x300?text=Ege+Haber'">
+                                        <div class="news-body">
+                                            <span class="news-date"><i class="far fa-clock"></i> ${time}</span>
+                                            <h3 class="news-title">${item.title}</h3>
+                                            <span class="read-more">Devamını Oku <i class="fas fa-arrow-right"></i></span>
+                                        </div>
+                                    </a>
+                                </div>
+                            `;
+                            newsGrid.innerHTML += card;
+                        });
+                    } else {
+                        newsGrid.innerHTML = "<p>Haber akışına şu an ulaşılamıyor.</p>";
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    newsGrid.innerHTML = "<p>Bağlantı hatası oluştu.</p>";
+                });
+        });
+    </script>
+</body>
+</html>
