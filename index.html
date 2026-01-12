@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EGE HABER | Anlık Haber Merkezi</title>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* --- CSS TASARIM V6 --- */
+        :root {
+            --primary: #d90429; /* Canlı Kırmızı */
+            --dark: #111;
+            --light: #fff;
+            --bg: #f8f9fa;
+            --gray: #e9ecef;
+            --blue-tick: #1DA1F2;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Manrope', sans-serif;
+            background-color: var(--bg);
+            color: #333;
+            margin: 0;
+            padding: 0;
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+
+        /* HEADER & SAAT */
+        .top-info-bar {
+            background: var(--dark);
+            color: #ccc;
+            padding: 8px 0;
+            font-size: 13px;
+        }
+        .top-info-inner {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        /* Canlı Saat Tasarımı */
+        .live-clock {
+            color: #fff;
+            font-weight: 700;
+            font-family: monospace; /* Sayılar zıplamasın diye */
+            background: #222;
+            padding: 2px 8px;
+            border-radius: 4px;
+            border: 1px solid #444;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .live-clock i { color: var(--primary); animation: blink 1s infinite; }
+        @keyframes blink { 50% { opacity: 0; } }
+
+        header {
+            background: var(--light);
+            box-shadow: 0 2px 15px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 999;
+        }
+        .header-main {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 80px;
+        }
+        .logo {
+            font-size: 32px;
+            font-weight: 800;
+            color: var(--dark);
+            letter-spacing: -1px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+        .logo span { color: var(--primary); }
+
+        nav ul { display: flex; gap: 15px; }
+        nav a {
+            text-decoration: none;
+            color: var(--dark);
+            font-weight: 700;
+            font-size: 14px;
+            text-transform: uppercase;
+            padding: 8px 12px;
+            border-radius: 6px;
+            transition: 0.3s;
+        }
+        nav a:hover, nav a.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* SON DAKİKA BANDI */
+        .ticker-wrap {
+            background: var(--primary);
+            color: white;
+            display: flex;
+            height: 40px;
+            overflow: hidden;
+        }
+        .ticker-title {
+            background: #a1001b;
+            padding: 0 20px;
+            display: flex;
+            align-items: center;
+            font-weight: 800;
+            font-size: 13px;
+            z-index: 2;
+        }
+        .ticker-content {
+            display: flex;
+            align-items: center;
+            padding-left: 20px;
+            animation: marquee 25s linear infinite;
+            white-space: nowrap;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        @keyframes marquee { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
+
+        /* ANA SAYFA */
+        .main-layout {
+            display: grid;
+            grid-template-columns: 3fr 1fr;
+            gap: 30px;
+            margin-top: 30px;
+            margin-bottom: 50px;
+        }
+
+        /* HABERLER */
+        .section-title {
+            font-size: 24px;
+            font-weight: 800;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--gray);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .status-badge {
+            font-size: 12px;
+            background: #e1f5fe;
+            color: #0288d1;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        .news-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+        }
+
+        .news-card {
+            background: var(--light);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            transition: transform 0.3s;
+            cursor: pointer;
+            border: 1px solid #eee;
+            display: flex;
+            flex-direction: column;
+        }
+        .news-card:hover { transform: translateY(-5px); box-shadow: 0 15px 30px rgba(0,0,0,0.1); }
+
+        .img-holder {
+            width: 100%;
+            height: 180px;
+            position: relative;
+            background: #eee;
+        }
+        .news-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .category-pill {
+            position: absolute;
+            top: 10px; right: 10px;
+            background: var(--primary);
+            color: white;
+            font-size: 10px;
+            font-weight: 800;
+            padding: 3px 8px;
+            border-radius: 4px;
+            text-transform: uppercase;
+        }
+
+        .news-details { padding: 20px; flex-grow: 1; display: flex; flex-direction: column; }
+        .news-meta { font-size: 12px; color: #888; margin-bottom: 10px; display: flex; gap: 10px; }
+        .news-headline {
+            font-size: 17px;
+            font-weight: 700;
+            margin: 0 0 15px 0;
+            line-height: 1.4;
+            color: var(--dark);
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .read-btn {
+            margin-top: auto;
+            color: var(--primary);
+            font-weight: 700;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* SIDEBAR (PROFİL) */
+        .profile-box {
+            background: var(--light);
+            border-radius: 16px;
+            text-align: center;
+            padding: 35px 20px;
+            border-top: 5px solid var(--primary);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 100px;
+        }
+        .owner-badge {
+            display: inline-block;
+            background: var(--primary);
+            color: white;
+            font-size: 11px;
+            font-weight: 800;
+            padding: 4px 12px;
+            border-radius: 20px;
+            margin-bottom: 15px;
+        }
+        .profile-avatar-wrap {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 15px;
+        }
+        .profile-avatar {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid #f8f9fa;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .blue-check {
+            position: absolute;
+            bottom: 5px; right: 0;
+            font-size: 24px;
+            color: var(--blue-tick);
+            background: white;
+            border-radius: 50%;
+            border: 2px solid white;
+        }
+        .profile-name { font-size: 22px; font-weight: 800; margin: 0; color: var(--dark); }
+        .profile-title { color: #777; font-size: 13px; font-weight: 600; margin-bottom: 15px; text-transform: uppercase; }
+        .profile-bio { font-size: 14px; color: #555; line-height: 1.6; margin-bottom: 20px; }
+        .insta-link {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(45deg, #833ab4, #fd1d1d, #fcb045);
+            color: white;
+            padding: 12px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 14px;
+            transition: 0.3s;
+        }
+        .insta-link:hover { transform: scale(1.05); box-shadow: 0 5px 15px rgba(253, 29, 29, 0.3); }
+
+        /* MODAL */
+        .modal {
+            display: none;
+            position: fixed; z-index: 10000;
+            left: 0; top: 0; width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.85);
+            justify-content: center; align-items: center;
+            backdrop-filter: blur(5px);
+        }
+        .modal-content {
+            background-color: #fff;
+            width: 90%; max-width: 600px;
+            border-radius: 12px;
+            padding: 25px;
+            position: relative;
+            animation: slideUp 0.3s;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        @keyframes slideUp { from {transform: translateY(50px); opacity: 0;} to {transform: translateY(0); opacity: 1;} }
+        .close { position: absolute; top: 15px; right: 20px; font-size: 28px; cursor: pointer; color: #aaa; }
+        .close:hover { color: var(--primary); }
+
+        /* Mobil */
+        @media (max-width: 768px) {
+            .main-layout { grid-template-columns: 1fr; }
+            .header-main { flex-direction: column; height: auto; padding: 15px 0; gap: 15px; }
+            nav ul { gap: 10px; flex-wrap: wrap; justify-content: center; }
+            .section-title { font-size: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="top-info-bar">
+        <div class="container top-info-inner">
+            <span id="full-date"></span>
+            <div class="live-clock">
+                <i class="fas fa-clock"></i> <span id="clock-display">00:00:00</span>
+            </div>
+        </div>
+    </div>
+
+    <header>
+        <div class="container header-main">
+            <div class="logo" onclick="location.reload()">
+                <i class="fas fa-bolt" style="color:var(--primary)"></i> EGE<span>HABER</span>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="#" class="active" onclick="loadNews('karisik', this)">Tümü</a></li>
+                    <li><a href="#" onclick="loadNews('gundem', this)">Gündem</a></li>
+                    <li><a href="#" onclick="loadNews('spor', this)">Spor</a></li>
+                    <li><a href="#" onclick="loadNews('ekonomi', this)">Ekonomi</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <div class="ticker-wrap">
+        <div class="ticker-title">SON DAKİKA</div>
+        <div class="ticker-content">
+            Ege Haber devrede! • Anlık haber akışı ve canlı veriler • İmtiyaz Sahibi: Ege Herz • Türkiye gündeminden en sıcak başlıklar burada...
+        </div>
+    </div>
+
+    <div class="container main-layout">
+        
+        <main>
+            <div class="section-title">
+                <span id="cat-header">Günün Manşetleri</span>
+                <span class="status-badge"><i class="fas fa-circle" style="font-size:8px"></i> Canlı</span>
+            </div>
+            
+            <div id="news-grid" class="news-grid">
+                </div>
+        </main>
+
+        <aside>
+            <div class="profile-box">
+                <span class="owner-badge">İMTİYAZ SAHİBİ</span>
+                <div class="profile-avatar-wrap">
+                    <img src="https://ui-avatars.com/api/?name=Ege+Herz&background=f1f1f1&color=d90429&size=256" alt="Ege Herz" class="profile-avatar">
+                    <i class="fas fa-check-circle blue-check"></i>
+                </div>
+                <h3 class="profile-name">Ege Herz</h3>
+                <div class="profile-title">Genel Yayın Yönetmeni</div>
+                <p class="profile-bio">
+                    Gerçek habercilik, tarafsız bakış açısı. Ege Haber ile dünyanın nabzını tutun. Doğru, hızlı ve güvenilir.
+                </p>
+                <a href="https://instagram.com/egeherz" target="_blank" class="insta-link">
+                    <i class="fab fa-instagram"></i> Instagram'da Takip Et
+                </a>
+            </div>
+        </aside>
+    </div>
+
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <img id="m-img" src="" style="width:100%; height:250px; object-fit:cover; border-radius:8px; margin-bottom:15px;">
+            <h2 id="m-title" style="margin-bottom:10px; color:var(--dark)"></h2>
+            <p id="m-desc" style="color:#555; line-height:1.6"></p>
+            <div style="margin-top:20px; padding-top:10px; border-top:1px solid #eee; font-size:12px; color:#888" id="m-meta"></div>
+        </div>
+    </div>
+
+    <script>
+        // --- 1. CANLI SAAT (Saniye Saniye) ---
+        function updateClock() {
+            const now = new Date();
+            // Saat:Dakika:Saniye
+            const timeString = now.toLocaleTimeString('tr-TR'); 
+            document.getElementById('clock-display').textContent = timeString;
+            
+            // Tarih
+            const dateString = now.toLocaleDateString('tr-TR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            document.getElementById('full-date').textContent = dateString;
+        }
+        setInterval(updateClock, 1000); // Her 1000ms (1 saniye) de bir çalış
+        updateClock(); // İlk açılışta hemen göster
+
+        // --- 2. YEDEK HABERLER (ASLA SİLİNMEZ) ---
+        // API çalışmasa bile bu haberler %100 gözükür.
+        const backupNews = [
+            {
+                title: "Borsada Hareketli Gün: Endeks Rekor Tazeledi",
+                link: "#",
+                pubDate: new Date().toString(),
+                description: "Borsa İstanbul'da BIST 100 endeksi günü yükselişle tamamladı. Yatırımcılar küresel piyasaları yakından takip ediyor.",
+                thumbnail: "https://images.unsplash.com/photo-1611974765270-ca12586343bb?w=600&q=80",
+                source: "EKONOMİ"
+            },
+            {
+                title: "Teknoloji Dünyası Bu Gelişmeyi Konuşuyor: Yapay Zeka Devrimi",
+                link: "#",
+                pubDate: new Date().toString(),
+                description: "Yeni nesil yapay zeka araçları hayatın her alanına girmeye başladı. Uzmanlar geleceğin mesleklerini tartışıyor.",
+                thumbnail: "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=600&q=80",
+                source: "TEKNOLOJİ"
+            },
+            {
+                title: "Ege Haber Yayında: Dijital Medyada Yeni Bir Soluk",
+                link: "#",
+                pubDate: new Date().toString(),
+                description: "İmtiyaz Sahibi Ege Herz yönetimindeki Ege Haber, tarafsız ve hızlı habercilik ilkesiyle yayın hayatına başladı.",
+                thumbnail: "https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=600&q=80",
+                source: "GÜNDEM"
+            },
+            {
+                title: "Milli Takım Hazırlıklarına Tam Gaz Devam Ediyor",
+                link: "#",
+                pubDate: new Date().toString(),
+                description: "A Milli Futbol Takımı, önümüzdeki maçlar için kampa girdi. Teknik heyet oyuncuların performansından memnun.",
+                thumbnail: "https://images.unsplash.com/photo-1518091043644-c1d4457512c6?w=600&q=80",
+                source: "SPOR"
+            },
+            {
+                title: "İstanbul Trafiği İçin Yeni Çözüm Önerisi Masada",
+                link: "#",
+                pubDate: new Date().toString(),
+                description: "Büyükşehirlerde artan trafik yoğunluğuna karşı toplu taşıma ve akıllı sinyalizasyon sistemleri geliştiriliyor.",
+                thumbnail: "https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?w=600&q=80",
+                source: "YAŞAM"
+            },
+            {
+                title: "Altın Fiyatlarında Son Durum: Yatırımcı Ne Yapmalı?",
+                link: "#",
+                pubDate: new Date().toString(),
+                description: "Gram altın ve çeyrek altın fiyatlarındaki dalgalanma devam ediyor. Analistlerin yıl sonu tahminleri haberimizde.",
+                thumbnail: "https://images.unsplash.com/photo-1574607383476-f2c7115f9ddb?w=600&q=80",
+                source: "FİNANS"
+            }
+        ];
+
+        // --- 3. HABER MOTORU ---
+        const sources = {
+            'karisik': 'https://www.cnnturk.com/feed/66/index.rss',
+            'gundem': 'https://www.trthaber.com/xml/sondakika.xml',
+            'spor': 'https://www.fotomac.com.tr/rss/anasayfa.xml',
+            'ekonomi': 'https://www.bloomberght.com/rss'
+        };
+
+        function renderNews(items) {
+            const grid = document.getElementById('news-grid');
+            grid.innerHTML = ""; // Temizle
+            
+            items.forEach(item => {
+                // Görsel Kontrolü
+                let img = "https://images.unsplash.com/photo-1585829365295-ab7cd400c167?w=600&q=80";
+                if(item.thumbnail && item.thumbnail.startsWith("http")) img = item.thumbnail;
+                else if(item.enclosure && item.enclosure.link) img = item.enclosure.link;
+
+                // Başlık
+                const title = item.title;
+                const date = new Date(item.pubDate).toLocaleTimeString('tr-TR', {hour:'2-digit', minute:'2-digit'});
+                const sourceTag = item.source || "HABER";
+
+                const card = document.createElement('div');
+                card.className = 'news-card';
+                card.onclick = () => openModal(title, item.description, img, item.pubDate);
+
+                card.innerHTML = `
+                    <div class="img-holder">
+                        <span class="category-pill">${sourceTag}</span>
+                        <img src="${img}" class="news-img" onerror="this.src='https://via.placeholder.com/600x400?text=Ege+Haber'">
+                    </div>
+                    <div class="news-details">
+                        <div class="news-meta">
+                            <span><i class="far fa-clock"></i> ${date}</span>
+                        </div>
+                        <h3 class="news-headline">${title}</h3>
+                        <div class="read-btn">Haberi Oku <i class="fas fa-arrow-right"></i></div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        async function loadNews(cat, btn) {
+            // Buton aktifliği
+            if(btn) {
+                document.querySelectorAll('nav a').forEach(a => a.classList.remove('active'));
+                btn.classList.add('active');
+            }
+            document.getElementById('cat-header').textContent = cat.charAt(0).toUpperCase() + cat.slice(1) + " Haberleri";
+
+            // ÖNCE YEDEKLERİ GÖSTER (Ekran boş kalmasın)
+            renderNews(backupNews);
+
+            // Sonra Gerçeği Dene
+            const rssUrl = sources[cat] || sources['karisik'];
+            const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}`;
+
+            try {
+                const res = await fetch(apiUrl);
+                const data = await res.json();
+                if(data.status === 'ok' && data.items.length > 0) {
+                    // Gerçek veri geldiyse, yedeklerin üstüne yaz
+                    renderNews(data.items);
+                }
+            } catch (err) {
+                console.log("API hatası, yedekler gösteriliyor.");
+                // Hata olsa bile ekran boş kalmaz, backupNews zaten ekranda.
+            }
+        }
+
+        // --- 4. MODAL ---
+        const modal = document.getElementById('myModal');
+        function openModal(title, desc, img, date) {
+            document.getElementById('m-title').textContent = title;
+            document.getElementById('m-img').src = img;
+            
+            // HTML temizle
+            const tmp = document.createElement('div');
+            tmp.innerHTML = desc;
+            document.getElementById('m-desc').textContent = tmp.textContent.substring(0, 400) + "...";
+            
+            document.getElementById('m-meta').textContent = "Tarih: " + new Date(date).toLocaleString('tr-TR');
+            modal.style.display = "flex";
+        }
+        function closeModal() { modal.style.display = "none"; }
+        window.onclick = function(e) { if(e.target == modal) closeModal(); }
+
+        // Başlangıç
+        loadNews('karisik', document.querySelector('nav a'));
+
+    </script>
+</body>
+</html>
